@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import client from "@/lib/api";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { StatusBadge, TypeBadge, Confidence } from "@/components/Badges";
 import { toast } from "sonner";
 import { Check, X, Clock, GitBranch } from "lucide-react";
@@ -33,6 +33,7 @@ export default function FactDetail({ factId, onClose }) {
       <SheetContent className="bg-[#0A0A0A] border-l border-[#262626] text-[#F5F5F5] w-full sm:max-w-md overflow-y-auto" data-testid="fact-detail">
         <SheetHeader>
           <SheetTitle className="font-heading text-xl text-white">Fact Detail</SheetTitle>
+          <SheetDescription className="font-mono text-xs text-neutral-500">Provenance, timeline & supersession for this memory fact.</SheetDescription>
         </SheetHeader>
 
         {!fact ? (
