@@ -137,7 +137,7 @@ export default function Connect() {
             <button data-testid="copy-stdio" onClick={() => copy(stdioSnippet, "Local config")} className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white"><Copy className="w-3.5 h-3.5" /> Copy</button>
           </div>
           <pre className="bg-[#050505] border border-[#262626] p-4 font-mono text-xs text-neutral-300 overflow-x-auto" data-testid="mcp-stdio-config">{stdioSnippet}</pre>
-          <p className="text-xs text-neutral-600 mt-3">Runs <span className="font-mono text-neutral-400">mcp_stdio.py</span> directly against your DB — no HTTP hop, privacy-first for local single-user setups.</p>
+          <p className="text-xs text-neutral-600 mt-3">Runs <span className="font-mono text-neutral-400">mcp_stdio.py</span> directly against your DB — no HTTP hop, privacy-first for local single-user setups. Replace <span className="font-mono text-amber-400/80">sk-emergent-...</span> with your actual Emergent LLM key.</p>
         </div>
 
         <div className="border border-[#262626] p-6">
@@ -156,6 +156,7 @@ export default function Connect() {
             <div className="divide-y divide-[#262626] border border-[#262626]" data-testid="bundles-list">
               {bundles.map((b) => (
                 <div key={b.id} className="flex items-center gap-4 px-4 py-3">
+                  <span className="font-mono text-[10px] text-neutral-600 shrink-0">{b.id.slice(0, 8)}</span>
                   <span className="font-mono text-xs text-neutral-500 flex-1 truncate">{new Date(b.created_at).toLocaleString()} · {b.facts} facts · {b.events} events · {(b.size / 1024).toFixed(1)} KB</span>
                   <button data-testid={`download-bundle-${b.id}`} onClick={() => downloadBundle(b)} className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white transition-colors">
                     <Download className="w-3.5 h-3.5" /> Download

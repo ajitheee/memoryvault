@@ -36,12 +36,19 @@ dashboard to own and manage a user vault.
 - Verified: 25/25 backend tests, 12/12 frontend flows (test_reports/iteration_1.json).
 
 ## Backlog / Remaining
-- P1: Local stdio MCP transport package for fully-local single-user use.
-- P1: Object-storage-backed export bundles (currently client-side JSON download).
-- P2: SQLite (`demo_vault.db`) → MongoDB one-time importer.
-- P2: Rate limits, richer observability, brute-force lockout (playbook-provided, not yet wired).
-- P2: Benchmark harness vs mem0/Zep.
-- P2: Tighten context-pack budget accounting to count section headers.
+- P2: Move object-storage upload to fully-async httpx (currently sync via asyncio.to_thread).
+- P2: Distributed rate limiting (current limiter is per-process, fine for single container).
+- P2: Expose bundle soft-delete endpoint; periodic prune of ratelimit buckets.
+- P3: Head-to-head benchmark run vs real mem0/Zep (adapters stubbed, need API keys).
+
+## Completed hardening + features (2026-07-07, iteration 2)
+- [x] API rate limiting — sliding-window (auth 30/60s per IP, mcp 120/60s per IP, save 30/60s & context-pack 60/60s per vault). `ratelimit.py` + middleware.
+- [x] Background decay scheduler — `decay_scheduler()` runs every DECAY_INTERVAL_SECONDS across all vaults.
+- [x] Benchmark harness vs mem0/Zep — `benchmark/harness.py` (Recall@k, MRR, latency); MemoryVaultAdapter live, mem0/Zep adapter stubs.
+- [x] Local stdio MCP transport — `mcp_stdio.py` (newline-delimited JSON-RPC over stdin/stdout, reuses HTTP tool dispatch, auth via MCP_TOKEN env).
+- [x] Object-storage export bundles — `storage.py` + `/api/export/bundle` (create/list/download), served via backend with vault isolation.
+- [x] `demo_vault.db` → Mongo importer — `importer.py` (heuristic SQLite schema introspection, CLI).
+- Verified: 33/33 backend tests + rate-limit burst + Connect page UI (test_reports/iteration_2.json).
 
 ## Next Tasks
-- Ship stdio transport + importer, then hardening (rate limits, decay scheduler).
+- Async storage client, distributed limiter, bundle lifecycle mgmt, live mem0/Zep benchmark comparison.
