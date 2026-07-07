@@ -1,0 +1,47 @@
+{
+  "summary": "Full E2E validation of MemoryVault (backend REST + MCP JSON-RPC + React dashboard). 25/25 pytest cases pass and 12/12 frontend flows pass. Auth (register/login/me/admin), ingestion + Claude Opus 4.5 fact extraction, high-stakes gating (health/contact -> pending), supersession, pending confirm/reject, semantic search + scoring, token-budgeted context pack, decay, JSON export, vault isolation between users, MCP initialize/tools_list/tools_call with Bearer mcp_token, unauthorized 401, and MCP token regeneration all verified against the live public URL.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/context-pack", "issue": "tokens_used can slightly exceed token_budget by a few tokens because the header 'User Memory Context' is always counted but the section headers ('## Profile', '## Relevant Memory') and blank separators are NOT counted toward `used` during greedy fill (see memory.build_context_pack). In practice output stays within budget for normal budgets (>=300), and the returned tokens_used field is computed on the final assembled string so is honest. Not blocking, but the fill loop underestimates cost."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "FactDetail dialog", "issues": ["Radix a11y console warning: 'Missing Description or aria-describedby={undefined} for {DialogContent}'. Add a <DialogDescription> or aria-describedby to the Sheet/Dialog content in FactDetail.jsx."]},
+      {"screen": "Landing hero h1", "issues": ["The two-line headline 'A memory your AI<br />actually keeps.' is read as 'A memory your AIactually keeps.' when the <br/> is stripped by screen readers or when parsed to text; visual is fine (line break), but the tags render without whitespace and screen readers may lose the break. Consider 'A memory your AI\\n' or hidden space."]},
+      {"screen": "Global", "issues": ["Overview stats show em-dash '—' while data is loading. Consider a skeleton placeholder or 0 to avoid confusing 'no data' impression."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_memoryvault.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "OPTIONAL: Add DialogDescription (or aria-describedby) to FactDetail's Sheet/Dialog to silence the Radix a11y warning.",
+    "OPTIONAL: In memory.build_context_pack, include section header token cost in the greedy fill accounting for tighter budget adherence (functional impact minimal).",
+    "No blocking issues. App is ready for handoff."
+  ],
+  "critical_code_review_comments": [
+    "server.py imports 'uuid' and '_public_user' but does not use them (dead imports). Minor cleanup.",
+    "auth.py 'get_current_user' looks up user WITHOUT projecting out 'password_hash' — the password hash is loaded into memory on every authenticated request. Consider projecting {'_id': 0, 'password_hash': 0} for safety in logs/debug.",
+    "memory.build_context_pack does not count the '\\n\\n' separator and section headers ('## Profile', '## Relevant Memory') toward `used`, so it can undercount. In practice budget still holds because approx_tokens returned at the end is honest, but internally the loop could add one extra line beyond target on tight budgets.",
+    "server.py CORS uses allow_credentials=False but allow_origins=['*'] which is fine; if you ever want cookies you'll need explicit origins. Currently JWT-in-header only so acceptable.",
+    "extractor.py catches broad Exception and returns [] silently on both primary+fallback failure; recommend surfacing model='error' to the client (already returned) and logging with more detail (currently only .error and .warning at logger — good).",
+    "auth.py duplicate registration returns 400 with detail; register/login raise HTTPException 400/401 — good use of status codes. Passwords are bcrypt-hashed via bcrypt.gensalt() -> $2b$ prefix (verified working).",
+    "mcp.py tools/list returns exactly 6 tools with proper JSON schema. tools/call returns text content with json.dumps(default=str) — good handling for non-serializable types.",
+    "No use of MongoDB _id in responses — all queries project {'_id': 0}. Good."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_memoryvault.py (new)"
+  ],
+  "success_rate": {"backend": "100% (25/25)", "frontend": "100% (12/12 after admin fresh-session verification)"},
+  "test_credentials": "Seeded admin admin@memoryvault.dev / admin123 works. Test users created ad-hoc with TEST_/e2e_ email prefixes.",
+  "seed_data_creation": "Ad-hoc TEST_* users created by pytest fixtures (per session). Frontend E2E created one e2e_* user and ingested 2 messages under it.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend regression suite at /app/backend/tests/test_memoryvault.py (25 tests, parallel via pytest-xdist configured in pytest.ini). LLM extraction via Claude Opus 4.5 works reliably (~2-4s per call). MCP JSON-RPC at POST /api/mcp; tools/call REQUIRES Authorization: Bearer <mcp_token from /api/mcp/info>. High-stakes types are {health, finance, contact} — always gated to pending. Supersession works on same (type, key) pair.",
+  "rca of the issue": "No production issues. Only minor cosmetic/code-quality suggestions listed under critical_code_review_comments and design_issues."
+}
