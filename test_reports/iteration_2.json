@@ -1,0 +1,55 @@
+{
+  "summary": "Iteration 2 (feature addition) fully validated. Ran regression (25/25 pytest pass) + 8 new iter2 backend tests (8/8 pass) + 1 ad-hoc auth rate-limit burst script (30x 401 then 429 with Retry-After) + Playwright UI test of /app/connect (all sections + create-bundle + download-bundle-{id} working). CLI modules (mcp_stdio.py, importer.py, benchmark/harness.py) all import cleanly. Object storage initializes at startup. All new features shipped as specified.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/export/bundle", "issue": "storage.put_object is synchronous requests.put() executed via asyncio.to_thread — OK for a serverless-scale API, but under heavy concurrent load it will block a thread-pool worker per upload. Consider aiohttp/httpx.AsyncClient for pure async."},
+      {"endpoint": "ratelimit.check", "issue": "In-memory sliding window is per-process; if backend ever scales to >1 replica behind a load balancer, effective per-IP limits will multiply by replica count. Fine for single-container preview; document limitation. Also, the _buckets defaultdict grows unbounded (key never GCed) — small leak over long-running processes. Consider periodic prune of empty deques."},
+      {"endpoint": "middleware rate_limit_middleware", "issue": "Auth rate limit uses key `auth:{ip}` for BOTH /api/auth/register and /api/auth/login combined. That's fine, but means a user in a heavy CI/test loop can lock out real users behind the same NAT. Not a bug, but worth logging."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Connect page — Cloud export bundles list", "issues": ["Bundle rows show only 'created_at · N facts · N events · KB' but no bundle id/preview. Downloading is fine but users cannot visually distinguish two same-size bundles from same second (rare). Consider showing short id prefix (b.id.slice(0,8))."]},
+      {"screen": "Connect page — stdio config", "issues": ["EMERGENT_LLM_KEY is shown as literal 'sk-emergent-...' placeholder in the snippet. If a user copies verbatim into claude_desktop_config.json, stdio server will fail. A one-line note above the snippet ('replace sk-emergent-... with your key') would help."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_memoryvault.py",
+    "/app/backend/tests/test_iter2_features.py",
+    "/app/backend/tests/burst_auth_ratelimit.py",
+    "/app/test_reports/pytest/regression.xml",
+    "/app/test_reports/pytest/iter2_features.xml"
+  ],
+  "action_items": [
+    "OPTIONAL: Show bundle id prefix in the Connect page bundles list for disambiguation.",
+    "OPTIONAL: Add inline note next to stdio EMERGENT_LLM_KEY placeholder telling the user to replace it.",
+    "OPTIONAL: Periodically prune ratelimit._buckets empty deques to avoid slow memory growth over weeks of uptime.",
+    "NO BLOCKING ISSUES. Iteration 2 features are production-ready."
+  ],
+  "critical_code_review_comments": [
+    "server.py POST /api/export/bundle correctly wraps storage.put_object in asyncio.to_thread (good — sync requests lib doesn't block the event loop). Catches Exception and re-raises as 502 — good error boundary.",
+    "server.py list_export_bundles projects out _id via {'_id':0} and sorts by created_at DESC — matches spec ('newest first').",
+    "server.py download_export_bundle correctly filters by BOTH id AND vault_id, so a valid bundle id from another user returns 404. Verified via test_bundle_vault_isolation. Solid isolation.",
+    "ratelimit.py sliding-window uses time.time() + deque + popleft() — O(1) amortized. Retry-After header is int seconds — correct HTTP semantics.",
+    "ratelimit.client_ip trusts the first hop of X-Forwarded-For — fine behind a trusted ingress like Kubernetes, but do not deploy this behind an untrusted proxy without validation (users can spoof X-Forwarded-For and bypass the limit).",
+    "storage.py caches _storage_key in a module-global — good for reuse, but not thread-safe if init_storage is called concurrently on a cold start. asyncio.to_thread + a shared cache is acceptable because init only happens once at startup.",
+    "mcp_stdio.py properly reuses TOOLS and _dispatch_tool from mcp.py — no drift risk between HTTP and stdio transports. Vault resolution via MCP_TOKEN env is correct.",
+    "importer.py heuristic column classifier is reasonable but silent on ambiguous rows (skips tables without recognized columns and prints them). Good defensive behavior for an unknown schema.",
+    "server.py CORS still uses allow_origins from env with allow_credentials=False — consistent with iter1. JWT-in-header is fine.",
+    "server.py rate_limit_middleware runs BEFORE routes but the per-vault ratelimit.check(save:*, ctx:*) runs inside endpoints AFTER auth resolution. Correct ordering — IP burst is capped first, then per-vault limits."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter2_features.py (new)",
+    "/app/backend/tests/burst_auth_ratelimit.py (new — ad-hoc, not in pytest suite)"
+  ],
+  "success_rate": {"backend": "100% (33/33 automated + 1/1 ad-hoc rate-limit burst)", "frontend": "100% (all Connect page testids present + create/download/regen flows work)"},
+  "test_credentials": "Seeded admin admin@memoryvault.dev / admin123 works. Ad-hoc TEST_i2_* / TEST_a_* / TEST_b_* users created by fixtures.",
+  "seed_data_creation": "Iter2 tests create 2 fresh users (TEST_i2_x_*, TEST_i2_y_*) and 2+ export bundles. Regression suite creates its own TEST_a_*, TEST_b_* users. UI test used seeded admin and created 1 bundle via UI.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter2 automated regression = /app/backend/tests/test_iter2_features.py (8 tests, 6.6s) + /app/backend/tests/test_memoryvault.py (25 tests, 15s). Burst auth rate-limit test at /app/backend/tests/burst_auth_ratelimit.py — run in isolation because it consumes the 30/60s auth IP window (sleeps 65s at start). Rate limits: auth 30/60s per IP, mcp 120/60s per IP, /memory/save 30/60s per vault, /context-pack 60/60s per vault. Object storage: emergent internal, path pattern memoryvault/exports/{vault_id}/{bundle_id}.json. Bundles are soft-deletable via is_deleted flag (not exposed as endpoint yet). Frontend token key: localStorage['mv_token'].",
+  "rca of the issue": "No issues encountered. Rate limiter, export bundles (with vault isolation), and Connect page UI all working per spec on first run."
+}

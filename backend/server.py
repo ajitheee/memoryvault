@@ -1,14 +1,19 @@
 import os
+import json
 import uuid
+import asyncio
 import logging
 
-from fastapi import FastAPI, APIRouter, Depends, HTTPException
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, Request, Response
 from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from db import db
-from auth import auth_router, get_current_user, seed_admin, new_mcp_token, _public_user
+from auth import auth_router, get_current_user, seed_admin, new_mcp_token
 import memory
+import ratelimit
+import storage
 from mcp import mcp_router
 
 logging.basicConfig(level=logging.INFO,
@@ -103,6 +108,7 @@ async def events(user: dict = Depends(get_current_user)):
 # ---------- Ingestion / retrieval ----------
 @api_router.post("/memory/save")
 async def save(body: SaveMemoryInput, user: dict = Depends(get_current_user)):
+    ratelimit.check(f"save:{vault_id_of(user)}", 30, 60)
     return await memory.save_memory(vault_id_of(user), body.text, body.role)
 
 
@@ -113,6 +119,7 @@ async def search(body: SearchInput, user: dict = Depends(get_current_user)):
 
 @api_router.post("/context-pack")
 async def context_pack(body: ContextPackInput, user: dict = Depends(get_current_user)):
+    ratelimit.check(f"ctx:{vault_id_of(user)}", 60, 60)
     return await memory.build_context_pack(vault_id_of(user), body.query, body.token_budget)
 
 
@@ -130,6 +137,51 @@ async def rebuild(user: dict = Depends(get_current_user)):
 @api_router.get("/export")
 async def export(user: dict = Depends(get_current_user)):
     return await memory.export_vault(vault_id_of(user))
+
+
+# ---------- Export bundles (object storage) ----------
+@api_router.post("/export/bundle")
+async def create_export_bundle(user: dict = Depends(get_current_user)):
+    vid = vault_id_of(user)
+    data = await memory.export_vault(vid)
+    payload = json.dumps(data, indent=2, default=str).encode("utf-8")
+    bundle_id = str(uuid.uuid4())
+    path = f"{storage.APP_NAME}/exports/{vid}/{bundle_id}.json"
+    try:
+        result = await asyncio.to_thread(storage.put_object, path, payload, "application/json")
+    except Exception as e:
+        logger.error("Export bundle upload failed: %s", e)
+        raise HTTPException(status_code=502, detail="Object storage unavailable")
+    rec = {
+        "id": bundle_id, "vault_id": vid, "storage_path": result["path"],
+        "size": result.get("size", len(payload)),
+        "facts": len(data["facts"]), "events": len(data["events"]),
+        "created_at": memory.now_iso(), "is_deleted": False,
+    }
+    await db.export_bundles.insert_one(dict(rec))
+    rec.pop("_id", None)
+    return rec
+
+
+@api_router.get("/export/bundles")
+async def list_export_bundles(user: dict = Depends(get_current_user)):
+    return await db.export_bundles.find(
+        {"vault_id": vault_id_of(user), "is_deleted": False}, {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+
+
+@api_router.get("/export/bundle/{bundle_id}/download")
+async def download_export_bundle(bundle_id: str, user: dict = Depends(get_current_user)):
+    rec = await db.export_bundles.find_one(
+        {"id": bundle_id, "vault_id": vault_id_of(user), "is_deleted": False}, {"_id": 0}
+    )
+    if not rec:
+        raise HTTPException(status_code=404, detail="Bundle not found")
+    content, _ = await asyncio.to_thread(storage.get_object, rec["storage_path"])
+    return Response(
+        content=content, media_type="application/json",
+        headers={"Content-Disposition": f'attachment; filename="memoryvault-{bundle_id}.json"'},
+    )
 
 
 # ---------- MCP connection info ----------
@@ -164,6 +216,36 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    path = request.url.path
+    ip = ratelimit.client_ip(request)
+    try:
+        if path.startswith("/api/auth"):
+            ratelimit.check(f"auth:{ip}", 30, 60)
+        elif path.startswith("/api/mcp"):
+            ratelimit.check(f"mcp:{ip}", 120, 60)
+    except HTTPException as e:
+        return JSONResponse({"detail": e.detail}, status_code=e.status_code, headers=e.headers or {})
+    return await call_next(request)
+
+
+async def decay_scheduler():
+    interval = int(os.environ.get("DECAY_INTERVAL_SECONDS", "0"))
+    if interval <= 0:
+        return
+    while True:
+        await asyncio.sleep(interval)
+        try:
+            vaults = await db.users.distinct("id")
+            total = 0
+            for v in vaults:
+                total += (await memory.run_decay(v)).get("archived", 0)
+            logger.info("Scheduled decay archived %d fact(s) across %d vault(s)", total, len(vaults))
+        except Exception as e:
+            logger.error("Decay scheduler error: %s", e)
+
+
 @app.on_event("startup")
 async def startup():
     await db.users.create_index("email", unique=True)
@@ -171,7 +253,14 @@ async def startup():
     await db.facts.create_index([("vault_id", 1), ("status", 1)])
     await db.facts.create_index([("vault_id", 1), ("type", 1), ("key", 1)])
     await db.events.create_index([("vault_id", 1), ("created_at", -1)])
+    await db.export_bundles.create_index([("vault_id", 1), ("created_at", -1)])
     await seed_admin()
+    try:
+        await asyncio.to_thread(storage.init_storage)
+        logger.info("Object storage initialized")
+    except Exception as e:
+        logger.error("Object storage init failed: %s", e)
+    asyncio.create_task(decay_scheduler())
     logger.info("MemoryVault startup complete")
 
 

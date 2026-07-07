@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import client from "@/lib/api";
 import PageHeader from "@/components/PageHeader";
 import { toast } from "sonner";
-import { Copy, RefreshCw, Download, Plug, Terminal } from "lucide-react";
+import { Copy, RefreshCw, Download, Plug, Terminal, CloudUpload, Package } from "lucide-react";
 
 const BACKEND = process.env.REACT_APP_BACKEND_URL;
 
@@ -42,6 +42,46 @@ export default function Connect() {
     null,
     2
   );
+
+  const stdioSnippet = JSON.stringify(
+    {
+      mcpServers: {
+        "memoryvault-local": {
+          command: "python",
+          args: ["/app/backend/mcp_stdio.py"],
+          env: {
+            MCP_TOKEN: token,
+            MONGO_URL: "mongodb://localhost:27017",
+            DB_NAME: "test_database",
+            EMERGENT_LLM_KEY: "sk-emergent-...",
+          },
+        },
+      },
+    },
+    null,
+    2
+  );
+
+  const { data: bundles = [] } = useQuery({
+    queryKey: ["export-bundles"],
+    queryFn: async () => (await client.get("/export/bundles")).data,
+  });
+
+  const createBundle = useMutation({
+    mutationFn: async () => (await client.post("/export/bundle")).data,
+    onSuccess: () => { toast.success("Cloud export bundle created"); qc.invalidateQueries({ queryKey: ["export-bundles"] }); },
+    onError: () => toast.error("Bundle creation failed"),
+  });
+
+  const downloadBundle = async (b) => {
+    const res = await client.get(`/export/bundle/${b.id}/download`, { responseType: "blob" });
+    const url = URL.createObjectURL(res.data);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `memoryvault-${b.id}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const doExport = async () => {
     const { data } = await client.get("/export");
@@ -91,10 +131,45 @@ export default function Connect() {
           <p className="text-xs text-neutral-600 mt-3">Exposes tools: <span className="font-mono text-neutral-400">search_memory, get_profile, save_memory, build_context_pack, confirm_fact, list_pending</span>.</p>
         </div>
 
+        <div className="border border-[#262626] p-6">
+          <div className="flex items-center justify-between mb-3">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500 flex items-center gap-2"><Terminal className="w-3.5 h-3.5" /> Local stdio transport (fully offline)</p>
+            <button data-testid="copy-stdio" onClick={() => copy(stdioSnippet, "Local config")} className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white"><Copy className="w-3.5 h-3.5" /> Copy</button>
+          </div>
+          <pre className="bg-[#050505] border border-[#262626] p-4 font-mono text-xs text-neutral-300 overflow-x-auto" data-testid="mcp-stdio-config">{stdioSnippet}</pre>
+          <p className="text-xs text-neutral-600 mt-3">Runs <span className="font-mono text-neutral-400">mcp_stdio.py</span> directly against your DB — no HTTP hop, privacy-first for local single-user setups.</p>
+        </div>
+
+        <div className="border border-[#262626] p-6">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+            <div>
+              <p className="font-heading font-semibold text-lg flex items-center gap-2"><Package className="w-4 h-4" /> Cloud export bundles</p>
+              <p className="text-sm text-neutral-400">Snapshot your full vault to object storage — durable, re-downloadable.</p>
+            </div>
+            <button data-testid="create-bundle" onClick={() => createBundle.mutate()} disabled={createBundle.isPending} className="inline-flex items-center gap-2 border border-[#262626] px-4 py-2 text-sm hover:border-white/50 transition-colors disabled:opacity-50">
+              <CloudUpload className={`w-4 h-4 ${createBundle.isPending ? "animate-pulse" : ""}`} /> New Bundle
+            </button>
+          </div>
+          {bundles.length === 0 ? (
+            <p className="text-sm text-neutral-600">No cloud bundles yet.</p>
+          ) : (
+            <div className="divide-y divide-[#262626] border border-[#262626]" data-testid="bundles-list">
+              {bundles.map((b) => (
+                <div key={b.id} className="flex items-center gap-4 px-4 py-3">
+                  <span className="font-mono text-xs text-neutral-500 flex-1 truncate">{new Date(b.created_at).toLocaleString()} · {b.facts} facts · {b.events} events · {(b.size / 1024).toFixed(1)} KB</span>
+                  <button data-testid={`download-bundle-${b.id}`} onClick={() => downloadBundle(b)} className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white transition-colors">
+                    <Download className="w-3.5 h-3.5" /> Download
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div className="border border-[#262626] p-6 flex items-center justify-between flex-wrap gap-4">
           <div>
-            <p className="font-heading font-semibold text-lg">Data ownership</p>
-            <p className="text-sm text-neutral-400">Full-fidelity JSON export of every event and fact.</p>
+            <p className="font-heading font-semibold text-lg">Instant JSON export</p>
+            <p className="text-sm text-neutral-400">Download the full vault right now, no storage round-trip.</p>
           </div>
           <button data-testid="connect-export" onClick={doExport} className="inline-flex items-center gap-2 bg-white text-black font-semibold px-5 py-2.5 hover:bg-neutral-200 transition-colors">
             <Download className="w-4 h-4" /> Export Vault
