@@ -27,7 +27,7 @@ export default function ContextPack() {
     <div>
       <PageHeader overline="build_context_pack" title="Context Pack Preview" testid="context-header" />
       <div className="p-8 grid lg:grid-cols-2 gap-8">
-        <div className="border border-[#262626] p-6 space-y-4 h-fit">
+        <div className="border border-[#1F2A33] p-6 space-y-4 h-fit">
           <div>
             <label className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">Query</label>
             <input
@@ -35,7 +35,7 @@ export default function ContextPack() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="What should the model know about me for this task?"
-              className="mt-1 w-full bg-[#050505] border border-[#262626] px-3 py-2.5 text-sm outline-none focus:border-white transition-colors"
+              className="mt-1 w-full bg-[#070B0F] border border-[#1F2A33] px-3 py-2.5 text-sm outline-none focus:border-[#22D3EE] transition-colors"
             />
           </div>
           <div>
@@ -55,13 +55,13 @@ export default function ContextPack() {
             data-testid="context-run"
             onClick={() => run.mutate()}
             disabled={!query.trim() || run.isPending}
-            className="w-full inline-flex items-center justify-center gap-2 bg-white text-black font-semibold py-2.5 hover:bg-neutral-200 transition-colors disabled:opacity-50"
+            className="w-full inline-flex items-center justify-center gap-2 bg-[#22D3EE] text-black font-semibold py-2.5 hover:bg-[#67E8F9] transition-colors disabled:opacity-50"
           >
             {run.isPending ? <><Loader2 className="w-4 h-4 animate-spin" /> Building…</> : <><Play className="w-4 h-4" /> Build Pack</>}
           </button>
         </div>
 
-        <div className="border border-[#262626] p-6">
+        <div className="border border-[#1F2A33] p-6">
           <div className="flex items-center justify-between mb-4">
             <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">Output</p>
             {pack && (
@@ -80,11 +80,11 @@ export default function ContextPack() {
                   <span>{pack.tokens_used} / {pack.token_budget} tokens · {pack.facts_included} facts</span>
                   <span>{pct}%</span>
                 </div>
-                <div className="h-2 bg-[#262626]">
-                  <div className={`h-full ${pct > 90 ? "bg-amber-500" : "bg-white"}`} style={{ width: `${pct}%` }} />
+                <div className="h-2 bg-[#1F2A33]">
+                  <div className={`h-full ${pct > 90 ? "bg-amber-500" : "bg-[#22D3EE]"}`} style={{ width: `${pct}%` }} />
                 </div>
               </div>
-              <pre className="bg-[#050505] border border-[#262626] p-4 font-mono text-xs text-neutral-300 whitespace-pre-wrap overflow-x-auto max-h-[420px] overflow-y-auto">
+              <pre className="bg-[#070B0F] border border-[#1F2A33] p-4 font-mono text-xs text-neutral-300 whitespace-pre-wrap overflow-x-auto max-h-[420px] overflow-y-auto">
                 {pack.context}
               </pre>
             </div>

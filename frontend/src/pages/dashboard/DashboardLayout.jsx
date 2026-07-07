@@ -24,12 +24,12 @@ export default function DashboardLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F5] flex">
+    <div className="min-h-screen bg-[#0A0F14] text-[#F5F5F5] flex">
       {/* Sidebar */}
-      <aside className="w-60 border-r border-[#262626] flex flex-col fixed h-screen bg-[#0A0A0A]">
-        <div className="h-16 flex items-center gap-2 px-5 border-b border-[#262626]">
-          <div className="w-5 h-5 border border-white flex items-center justify-center">
-            <div className="w-2 h-2 bg-white" />
+      <aside className="w-60 border-r border-[#1F2A33] flex flex-col fixed h-screen bg-[#0A0F14]">
+        <div className="h-16 flex items-center gap-2 px-5 border-b border-[#1F2A33]">
+          <div className="w-5 h-5 border border-[#22D3EE] flex items-center justify-center">
+            <div className="w-2 h-2 bg-[#22D3EE]" />
           </div>
           <span className="font-heading font-extrabold tracking-tight">MEMORYVAULT</span>
         </div>
@@ -44,8 +44,8 @@ export default function DashboardLayout() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-5 py-2.5 text-sm border-l-2 transition-colors ${
                   isActive
-                    ? "border-white bg-[#141414] text-white"
-                    : "border-transparent text-neutral-400 hover:text-white hover:bg-[#111]"
+                    ? "border-[#22D3EE] bg-[#111820] text-white"
+                    : "border-transparent text-neutral-400 hover:text-white hover:bg-[#111820]"
                 }`
               }
             >
@@ -55,9 +55,9 @@ export default function DashboardLayout() {
           ))}
         </nav>
 
-        <div className="border-t border-[#262626] p-4">
+        <div className="border-t border-[#1F2A33] p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 border border-[#262626] flex items-center justify-center">
+            <div className="w-8 h-8 border border-[#1F2A33] flex items-center justify-center">
               <UserIcon className="w-4 h-4 text-neutral-400" />
             </div>
             <div className="min-w-0">
@@ -68,7 +68,7 @@ export default function DashboardLayout() {
           <button
             data-testid="logout-btn"
             onClick={doLogout}
-            className="w-full flex items-center gap-2 justify-center border border-[#262626] py-2 text-sm text-neutral-400 hover:text-white hover:border-white/50 transition-colors"
+            className="w-full flex items-center gap-2 justify-center border border-[#1F2A33] py-2 text-sm text-neutral-400 hover:text-white hover:border-[#22D3EE]/50 transition-colors"
           >
             <LogOut className="w-4 h-4" /> Sign out
           </button>

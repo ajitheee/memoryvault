@@ -26,27 +26,27 @@ const FEATURES = [
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F5]">
+    <div className="min-h-screen bg-[#0A0F14] text-[#F5F5F5]">
       {/* Nav */}
-      <header className="border-b border-[#262626] sticky top-0 z-50 bg-[#0A0A0A]/80 backdrop-blur">
+      <header className="border-b border-[#1F2A33] sticky top-0 z-50 bg-[#0A0F14]/80 backdrop-blur">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2" data-testid="brand-logo">
-            <div className="w-6 h-6 border border-white flex items-center justify-center">
-              <div className="w-2.5 h-2.5 bg-white" />
+            <div className="w-6 h-6 border border-[#22D3EE] flex items-center justify-center">
+              <div className="w-2.5 h-2.5 bg-[#22D3EE]" />
             </div>
             <span className="font-heading font-extrabold tracking-tight text-lg">MEMORYVAULT</span>
           </div>
           <nav className="flex items-center gap-2">
             <Link data-testid="nav-login" to="/login" className="px-4 py-2 text-sm text-neutral-300 hover:text-white transition-colors">Log in</Link>
-            <Link data-testid="nav-signup" to="/signup" className="px-4 py-2 text-sm bg-white text-black font-semibold hover:bg-neutral-200 transition-colors">Initialize Vault</Link>
+            <Link data-testid="nav-signup" to="/signup" className="px-4 py-2 text-sm bg-[#22D3EE] text-black font-semibold hover:bg-[#67E8F9] transition-colors">Initialize Vault</Link>
           </nav>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="relative border-b border-[#262626] overflow-hidden">
+      <section className="relative border-b border-[#1F2A33] overflow-hidden">
         <img src={HERO_IMG} alt="" className="absolute inset-0 w-full h-full object-cover opacity-25" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/50 via-[#0A0A0A]/70 to-[#0A0A0A]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0F14]/50 via-[#0A0F14]/70 to-[#0A0F14]" />
         <div className="relative max-w-7xl mx-auto px-6 py-28 md:py-40">
           <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="font-mono text-xs uppercase tracking-[0.25em] text-neutral-400 mb-6">
             Production MCP · User-owned AI memory
@@ -58,10 +58,10 @@ export default function Landing() {
             MemoryVault ingests your interactions, extracts typed facts with confidence and provenance, handles supersession and decay, and serves a token-budgeted context pack to any model — over a real Model Context Protocol server.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="mt-10 flex flex-wrap gap-3">
-            <Link data-testid="hero-cta" to="/signup" className="group inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-semibold hover:bg-neutral-200 transition-colors">
+            <Link data-testid="hero-cta" to="/signup" className="group inline-flex items-center gap-2 px-6 py-3 bg-[#22D3EE] text-black font-semibold hover:bg-[#67E8F9] transition-colors">
               Initialize Vault <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link data-testid="hero-login" to="/login" className="inline-flex items-center gap-2 px-6 py-3 border border-[#262626] hover:bg-[#141414] transition-colors">
+            <Link data-testid="hero-login" to="/login" className="inline-flex items-center gap-2 px-6 py-3 border border-[#1F2A33] hover:bg-[#111820] transition-colors">
               Log in
             </Link>
           </motion.div>
@@ -69,7 +69,7 @@ export default function Landing() {
       </section>
 
       {/* Marquee */}
-      <div className="border-b border-[#262626] overflow-hidden py-4 bg-[#0A0A0A]">
+      <div className="border-b border-[#1F2A33] overflow-hidden py-4 bg-[#0A0F14]">
         <div className="flex whitespace-nowrap animate-marquee w-max">
           {[...MARQUEE, ...MARQUEE].map((m, i) => (
             <span key={i} className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-500 mx-8 flex items-center gap-8">
@@ -85,7 +85,7 @@ export default function Landing() {
           <h2 className="font-heading font-bold tracking-tight text-3xl sm:text-4xl max-w-lg">The engine behind portable memory.</h2>
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-500">06 core systems</p>
         </div>
-        <div className="grid md:grid-cols-3 gap-px bg-[#262626] border border-[#262626]">
+        <div className="grid md:grid-cols-3 gap-px bg-[#1F2A33] border border-[#1F2A33]">
           {FEATURES.map((f, i) => (
             <motion.div
               key={f.title}
@@ -94,11 +94,11 @@ export default function Landing() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05 }}
-              className="bg-[#0A0A0A] p-8 hover:bg-[#111] transition-colors group"
+              className="bg-[#0A0F14] p-8 hover:bg-[#111820] transition-colors group"
             >
               <div className="flex items-center justify-between mb-6">
                 <f.icon className="w-6 h-6 text-white" strokeWidth={1.5} />
-                <span className="font-mono text-[10px] uppercase tracking-wider text-neutral-500 border border-[#262626] px-2 py-0.5">{f.tag}</span>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-neutral-500 border border-[#1F2A33] px-2 py-0.5">{f.tag}</span>
               </div>
               <h3 className="font-heading font-bold text-xl mb-3">{f.title}</h3>
               <p className="text-sm text-neutral-400 leading-relaxed">{f.body}</p>
@@ -108,32 +108,32 @@ export default function Landing() {
       </section>
 
       {/* Flow */}
-      <section className="border-t border-[#262626] bg-[#0A0A0A]">
+      <section className="border-t border-[#1F2A33] bg-[#0A0F14]">
         <div className="max-w-7xl mx-auto px-6 py-24">
           <h2 className="font-heading font-bold tracking-tight text-3xl sm:text-4xl mb-12">How it flows.</h2>
-          <div className="grid md:grid-cols-4 gap-px bg-[#262626] border border-[#262626]">
+          <div className="grid md:grid-cols-4 gap-px bg-[#1F2A33] border border-[#1F2A33]">
             {[
               ["01", "Sign up", "Get an isolated vault + a per-vault MCP connection token."],
               ["02", "Connect", "Point Claude Desktop, Cursor or any MCP client at your vault."],
               ["03", "Remember", "save_memory ingests text; the LLM extracts typed facts."],
               ["04", "Recall", "search_memory & build_context_pack give continuity everywhere."],
             ].map(([n, t, b]) => (
-              <div key={n} className="bg-[#0A0A0A] p-8">
-                <div className="font-mono text-4xl font-bold text-[#262626] mb-4">{n}</div>
+              <div key={n} className="bg-[#0A0F14] p-8">
+                <div className="font-mono text-4xl font-bold text-[#1F2A33] mb-4">{n}</div>
                 <h3 className="font-heading font-semibold text-lg mb-2">{t}</h3>
                 <p className="text-sm text-neutral-400 leading-relaxed">{b}</p>
               </div>
             ))}
           </div>
           <div className="mt-16 text-center">
-            <Link data-testid="footer-cta" to="/signup" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-semibold hover:bg-neutral-200 transition-colors">
+            <Link data-testid="footer-cta" to="/signup" className="inline-flex items-center gap-2 px-8 py-4 bg-[#22D3EE] text-black font-semibold hover:bg-[#67E8F9] transition-colors">
               Start your vault — it's free <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-[#262626]">
+      <footer className="border-t border-[#1F2A33]">
         <div className="max-w-7xl mx-auto px-6 py-8 flex items-center justify-between flex-wrap gap-4">
           <span className="font-mono text-xs text-neutral-600">MEMORYVAULT · MODEL CONTEXT PROTOCOL</span>
           <span className="font-mono text-xs text-neutral-600">L1 EVENTS · L2 FACTS · L3 INDEX</span>

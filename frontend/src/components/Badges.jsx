@@ -19,7 +19,7 @@ export function StatusBadge({ status, testid }) {
 
 export function TypeBadge({ type }) {
   return (
-    <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider border border-[#262626] text-neutral-300 bg-[#141414]">
+    <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider border border-[#1F2A33] text-neutral-300 bg-[#111820]">
       {type}
     </span>
   );
@@ -30,7 +30,7 @@ export function Confidence({ value }) {
   const color = pct >= 70 ? "bg-emerald-500" : pct >= 40 ? "bg-amber-500" : "bg-red-500";
   return (
     <div className="flex items-center gap-2 w-24">
-      <div className="h-1.5 flex-1 bg-[#262626]">
+      <div className="h-1.5 flex-1 bg-[#1F2A33]">
         <div className={`h-full ${color}`} style={{ width: `${pct}%` }} />
       </div>
       <span className="font-mono text-[11px] text-neutral-400 w-8">{pct}%</span>

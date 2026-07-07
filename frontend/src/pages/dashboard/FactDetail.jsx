@@ -30,7 +30,7 @@ export default function FactDetail({ factId, onClose }) {
 
   return (
     <Sheet open={!!factId} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="bg-[#0A0A0A] border-l border-[#262626] text-[#F5F5F5] w-full sm:max-w-md overflow-y-auto" data-testid="fact-detail">
+      <SheetContent className="bg-[#0A0F14] border-l border-[#1F2A33] text-[#F5F5F5] w-full sm:max-w-md overflow-y-auto" data-testid="fact-detail">
         <SheetHeader>
           <SheetTitle className="font-heading text-xl text-white">Fact Detail</SheetTitle>
           <SheetDescription className="font-mono text-xs text-neutral-500">Provenance, timeline & supersession for this memory fact.</SheetDescription>
@@ -58,7 +58,7 @@ export default function FactDetail({ factId, onClose }) {
               <Confidence value={fact.confidence} />
             </div>
 
-            <div className="border-t border-[#262626] pt-4 space-y-3">
+            <div className="border-t border-[#1F2A33] pt-4 space-y-3">
               <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500 flex items-center gap-2"><Clock className="w-3.5 h-3.5" /> Provenance & Timeline</p>
               <div className="font-mono text-xs text-neutral-400 space-y-1.5">
                 <Row k="fact_id" v={fact.id} />
@@ -73,7 +73,7 @@ export default function FactDetail({ factId, onClose }) {
             </div>
 
             {(fact.supersedes?.length > 0 || fact.superseded_by) && (
-              <div className="border-t border-[#262626] pt-4">
+              <div className="border-t border-[#1F2A33] pt-4">
                 <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500 flex items-center gap-2 mb-2"><GitBranch className="w-3.5 h-3.5" /> Supersession</p>
                 {fact.superseded_by && <p className="font-mono text-xs text-neutral-400">superseded_by: {fact.superseded_by}</p>}
                 {fact.supersedes?.map((id) => (
@@ -82,13 +82,13 @@ export default function FactDetail({ factId, onClose }) {
               </div>
             )}
 
-            <div className="border-t border-[#262626] pt-4">
+            <div className="border-t border-[#1F2A33] pt-4">
               <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500 mb-2">Canonical Text</p>
-              <div className="bg-[#050505] border border-[#262626] p-3 font-mono text-xs text-neutral-400">{fact.canonical_text}</div>
+              <div className="bg-[#070B0F] border border-[#1F2A33] p-3 font-mono text-xs text-neutral-400">{fact.canonical_text}</div>
             </div>
 
             {fact.status === "pending" && (
-              <div className="flex gap-2 border-t border-[#262626] pt-4">
+              <div className="flex gap-2 border-t border-[#1F2A33] pt-4">
                 <button
                   data-testid="confirm-fact-button"
                   onClick={() => confirm.mutate()}

@@ -34,14 +34,14 @@ export default function Pending() {
         {isLoading ? (
           <div className="p-10 text-center text-neutral-600 text-sm">Loading…</div>
         ) : pending.length === 0 ? (
-          <div className="border border-[#262626] p-16 text-center" data-testid="pending-empty">
+          <div className="border border-[#1F2A33] p-16 text-center" data-testid="pending-empty">
             <ShieldAlert className="w-8 h-8 mx-auto text-neutral-700 mb-3" />
             <p className="text-neutral-500">Queue is clear. Health, money and contact facts require your confirmation before going active.</p>
           </div>
         ) : (
-          <div className="space-y-px bg-[#262626] border border-[#262626]" data-testid="pending-list">
+          <div className="space-y-px bg-[#1F2A33] border border-[#1F2A33]" data-testid="pending-list">
             {pending.map((f) => (
-              <div key={f.id} data-testid={`pending-${f.id}`} className="bg-[#0A0A0A] p-5 flex items-center gap-4 flex-wrap">
+              <div key={f.id} data-testid={`pending-${f.id}`} className="bg-[#0A0F14] p-5 flex items-center gap-4 flex-wrap">
                 <div className="flex items-center gap-3 flex-1 min-w-[240px]">
                   <TypeBadge type={f.type} />
                   <div>

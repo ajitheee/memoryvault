@@ -16,7 +16,7 @@ function Protected({ children }) {
   const { user, ready } = useAuth();
   if (!ready) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0A0F14] flex items-center justify-center">
         <div className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-600 animate-pulse">Loading vault…</div>
       </div>
     );
@@ -51,7 +51,7 @@ function App() {
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-          <Toaster theme="dark" position="bottom-right" toastOptions={{ style: { background: "#141414", border: "1px solid #262626", color: "#F5F5F5", borderRadius: 0 } }} />
+          <Toaster theme="dark" position="bottom-right" toastOptions={{ style: { background: "#111820", border: "1px solid #1F2A33", color: "#F5F5F5", borderRadius: 0 } }} />
         </BrowserRouter>
       </AuthProvider>
     </div>

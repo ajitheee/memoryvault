@@ -26,16 +26,16 @@ export default function Auth({ mode = "login" }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F5] grid-bg flex items-center justify-center px-6">
+    <div className="min-h-screen bg-[#0A0F14] text-[#F5F5F5] grid-bg flex items-center justify-center px-6">
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center gap-2 mb-10 justify-center" data-testid="auth-brand">
-          <div className="w-6 h-6 border border-white flex items-center justify-center">
-            <div className="w-2.5 h-2.5 bg-white" />
+          <div className="w-6 h-6 border border-[#22D3EE] flex items-center justify-center">
+            <div className="w-2.5 h-2.5 bg-[#22D3EE]" />
           </div>
           <span className="font-heading font-extrabold tracking-tight text-lg">MEMORYVAULT</span>
         </Link>
 
-        <div className="border border-[#262626] bg-[#0A0A0A] p-8">
+        <div className="border border-[#1F2A33] bg-[#0A0F14] p-8">
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-500 mb-2">
             {isSignup ? "Initialize" : "Access"}
           </p>
@@ -51,7 +51,7 @@ export default function Auth({ mode = "login" }) {
                   data-testid="auth-name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="mt-1 w-full bg-[#111] border border-[#262626] px-3 py-2.5 text-sm outline-none focus:border-white transition-colors"
+                  className="mt-1 w-full bg-[#111820] border border-[#1F2A33] px-3 py-2.5 text-sm outline-none focus:border-[#22D3EE] transition-colors"
                   placeholder="Alex Rivera"
                 />
               </div>
@@ -64,7 +64,7 @@ export default function Auth({ mode = "login" }) {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full bg-[#111] border border-[#262626] px-3 py-2.5 text-sm outline-none focus:border-white transition-colors"
+                className="mt-1 w-full bg-[#111820] border border-[#1F2A33] px-3 py-2.5 text-sm outline-none focus:border-[#22D3EE] transition-colors"
                 placeholder="you@example.com"
               />
             </div>
@@ -76,7 +76,7 @@ export default function Auth({ mode = "login" }) {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 w-full bg-[#111] border border-[#262626] px-3 py-2.5 text-sm outline-none focus:border-white transition-colors"
+                className="mt-1 w-full bg-[#111820] border border-[#1F2A33] px-3 py-2.5 text-sm outline-none focus:border-[#22D3EE] transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -91,7 +91,7 @@ export default function Auth({ mode = "login" }) {
               data-testid="auth-submit"
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-white text-black font-semibold py-2.5 hover:bg-neutral-200 transition-colors disabled:opacity-60"
+              className="w-full flex items-center justify-center gap-2 bg-[#22D3EE] text-black font-semibold py-2.5 hover:bg-[#67E8F9] transition-colors disabled:opacity-60"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{isSignup ? "Initialize Vault" : "Log in"} <ArrowRight className="w-4 h-4" /></>}
             </button>

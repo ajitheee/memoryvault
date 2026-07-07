@@ -99,61 +99,61 @@ export default function Connect() {
     <div>
       <PageHeader overline="Model Context Protocol" title="MCP Connect" testid="connect-header" />
       <div className="p-8 space-y-8 max-w-3xl">
-        <div className="border border-[#262626] p-6">
+        <div className="border border-[#1F2A33] p-6">
           <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500 mb-2 flex items-center gap-2"><Plug className="w-3.5 h-3.5" /> HTTP Endpoint</p>
           <div className="flex items-center gap-2">
-            <code className="flex-1 bg-[#050505] border border-[#262626] px-3 py-2.5 font-mono text-sm text-neutral-300 break-all" data-testid="mcp-endpoint">{endpoint}</code>
-            <button data-testid="copy-endpoint" onClick={() => copy(endpoint, "Endpoint")} className="border border-[#262626] p-2.5 hover:border-white/50 transition-colors"><Copy className="w-4 h-4" /></button>
+            <code className="flex-1 bg-[#070B0F] border border-[#1F2A33] px-3 py-2.5 font-mono text-sm text-neutral-300 break-all" data-testid="mcp-endpoint">{endpoint}</code>
+            <button data-testid="copy-endpoint" onClick={() => copy(endpoint, "Endpoint")} className="border border-[#1F2A33] p-2.5 hover:border-[#22D3EE]/50 transition-colors"><Copy className="w-4 h-4" /></button>
           </div>
         </div>
 
-        <div className="border border-[#262626] p-6">
+        <div className="border border-[#1F2A33] p-6">
           <div className="flex items-center justify-between mb-2">
             <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">Vault MCP Token</p>
             <button data-testid="reveal-token" onClick={() => setRevealed((r) => !r)} className="text-xs text-neutral-400 hover:text-white">{revealed ? "Hide" : "Reveal"}</button>
           </div>
           <div className="flex items-center gap-2">
-            <code className="flex-1 bg-[#050505] border border-[#262626] px-3 py-2.5 font-mono text-sm text-neutral-300 break-all" data-testid="mcp-token">
+            <code className="flex-1 bg-[#070B0F] border border-[#1F2A33] px-3 py-2.5 font-mono text-sm text-neutral-300 break-all" data-testid="mcp-token">
               {revealed ? token : token.replace(/./g, "•").slice(0, 40)}
             </code>
-            <button data-testid="copy-token" onClick={() => copy(token, "Token")} className="border border-[#262626] p-2.5 hover:border-white/50 transition-colors"><Copy className="w-4 h-4" /></button>
-            <button data-testid="regen-token" onClick={() => regen.mutate()} className="border border-[#262626] p-2.5 hover:border-white/50 transition-colors"><RefreshCw className={`w-4 h-4 ${regen.isPending ? "animate-spin" : ""}`} /></button>
+            <button data-testid="copy-token" onClick={() => copy(token, "Token")} className="border border-[#1F2A33] p-2.5 hover:border-[#22D3EE]/50 transition-colors"><Copy className="w-4 h-4" /></button>
+            <button data-testid="regen-token" onClick={() => regen.mutate()} className="border border-[#1F2A33] p-2.5 hover:border-[#22D3EE]/50 transition-colors"><RefreshCw className={`w-4 h-4 ${regen.isPending ? "animate-spin" : ""}`} /></button>
           </div>
           <p className="text-xs text-neutral-600 mt-2">Send as <span className="font-mono text-neutral-400">Authorization: Bearer &lt;token&gt;</span>. Regenerating invalidates old clients.</p>
         </div>
 
-        <div className="border border-[#262626] p-6">
+        <div className="border border-[#1F2A33] p-6">
           <div className="flex items-center justify-between mb-3">
             <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500 flex items-center gap-2"><Terminal className="w-3.5 h-3.5" /> Client config (Claude Desktop / Cursor)</p>
             <button data-testid="copy-config" onClick={() => copy(configSnippet, "Config")} className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white"><Copy className="w-3.5 h-3.5" /> Copy</button>
           </div>
-          <pre className="bg-[#050505] border border-[#262626] p-4 font-mono text-xs text-neutral-300 overflow-x-auto" data-testid="mcp-config">{configSnippet}</pre>
+          <pre className="bg-[#070B0F] border border-[#1F2A33] p-4 font-mono text-xs text-neutral-300 overflow-x-auto" data-testid="mcp-config">{configSnippet}</pre>
           <p className="text-xs text-neutral-600 mt-3">Exposes tools: <span className="font-mono text-neutral-400">search_memory, get_profile, save_memory, build_context_pack, confirm_fact, list_pending</span>.</p>
         </div>
 
-        <div className="border border-[#262626] p-6">
+        <div className="border border-[#1F2A33] p-6">
           <div className="flex items-center justify-between mb-3">
             <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500 flex items-center gap-2"><Terminal className="w-3.5 h-3.5" /> Local stdio transport (fully offline)</p>
             <button data-testid="copy-stdio" onClick={() => copy(stdioSnippet, "Local config")} className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white"><Copy className="w-3.5 h-3.5" /> Copy</button>
           </div>
-          <pre className="bg-[#050505] border border-[#262626] p-4 font-mono text-xs text-neutral-300 overflow-x-auto" data-testid="mcp-stdio-config">{stdioSnippet}</pre>
+          <pre className="bg-[#070B0F] border border-[#1F2A33] p-4 font-mono text-xs text-neutral-300 overflow-x-auto" data-testid="mcp-stdio-config">{stdioSnippet}</pre>
           <p className="text-xs text-neutral-600 mt-3">Runs <span className="font-mono text-neutral-400">mcp_stdio.py</span> directly against your DB — no HTTP hop, privacy-first for local single-user setups. Replace <span className="font-mono text-amber-400/80">sk-emergent-...</span> with your actual Emergent LLM key.</p>
         </div>
 
-        <div className="border border-[#262626] p-6">
+        <div className="border border-[#1F2A33] p-6">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
             <div>
               <p className="font-heading font-semibold text-lg flex items-center gap-2"><Package className="w-4 h-4" /> Cloud export bundles</p>
               <p className="text-sm text-neutral-400">Snapshot your full vault to object storage — durable, re-downloadable.</p>
             </div>
-            <button data-testid="create-bundle" onClick={() => createBundle.mutate()} disabled={createBundle.isPending} className="inline-flex items-center gap-2 border border-[#262626] px-4 py-2 text-sm hover:border-white/50 transition-colors disabled:opacity-50">
+            <button data-testid="create-bundle" onClick={() => createBundle.mutate()} disabled={createBundle.isPending} className="inline-flex items-center gap-2 border border-[#1F2A33] px-4 py-2 text-sm hover:border-[#22D3EE]/50 transition-colors disabled:opacity-50">
               <CloudUpload className={`w-4 h-4 ${createBundle.isPending ? "animate-pulse" : ""}`} /> New Bundle
             </button>
           </div>
           {bundles.length === 0 ? (
             <p className="text-sm text-neutral-600">No cloud bundles yet.</p>
           ) : (
-            <div className="divide-y divide-[#262626] border border-[#262626]" data-testid="bundles-list">
+            <div className="divide-y divide-[#1F2A33] border border-[#1F2A33]" data-testid="bundles-list">
               {bundles.map((b) => (
                 <div key={b.id} className="flex items-center gap-4 px-4 py-3">
                   <span className="font-mono text-[10px] text-neutral-600 shrink-0">{b.id.slice(0, 8)}</span>
@@ -167,12 +167,12 @@ export default function Connect() {
           )}
         </div>
 
-        <div className="border border-[#262626] p-6 flex items-center justify-between flex-wrap gap-4">
+        <div className="border border-[#1F2A33] p-6 flex items-center justify-between flex-wrap gap-4">
           <div>
             <p className="font-heading font-semibold text-lg">Instant JSON export</p>
             <p className="text-sm text-neutral-400">Download the full vault right now, no storage round-trip.</p>
           </div>
-          <button data-testid="connect-export" onClick={doExport} className="inline-flex items-center gap-2 bg-white text-black font-semibold px-5 py-2.5 hover:bg-neutral-200 transition-colors">
+          <button data-testid="connect-export" onClick={doExport} className="inline-flex items-center gap-2 bg-[#22D3EE] text-black font-semibold px-5 py-2.5 hover:bg-[#67E8F9] transition-colors">
             <Download className="w-4 h-4" /> Export Vault
           </button>
         </div>
