@@ -1,0 +1,141 @@
+{
+  "project": "MemoryVault",
+  "theme": "dark",
+  "archetype": "Archetype 4 (Swiss & High-Contrast) / Neo-Brutalist Dev Tool",
+  "design_philosophy": "A high-density, brutalist, and hyper-functional design. The vault is an objective source of truth for the AI. Visuals rely on raw grids, monospace data points, stark contrast, and the complete elimination of decorative gradients or soft shadows. The interface must feel like a secure 'Control Room'.",
+  "typography": {
+    "fonts": {
+      "headings": "Cabinet Grotesk, sans-serif",
+      "body": "Inter, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "scale": {
+      "h1": "text-5xl sm:text-6xl font-black tracking-tighter leading-none",
+      "h2": "text-3xl sm:text-4xl font-bold tracking-tight",
+      "h3": "text-xl sm:text-2xl font-semibold",
+      "h4": "text-lg font-medium",
+      "body": "text-base leading-relaxed",
+      "small": "text-sm",
+      "overline": "text-xs font-mono uppercase tracking-[0.2em]"
+    },
+    "rules": [
+      "Use JetBrains Mono for all token counts, JSON previews, IDs, and metadata.",
+      "Headings over 32px must use tracking-tight or tracking-tighter.",
+      "Never center-align data-heavy dashboard components; strictly left-aligned."
+    ]
+  },
+  "colors": {
+    "background": {
+      "default": "#0A0A0A",
+      "surface": "#141414",
+      "surface_hover": "#1E1E1E"
+    },
+    "border": {
+      "default": "#262626",
+      "focus": "#FFFFFF"
+    },
+    "text": {
+      "primary": "#F5F5F5",
+      "secondary": "#A3A3A3",
+      "disabled": "#525252"
+    },
+    "accents": {
+      "primary": "#FFFFFF",
+      "primary_foreground": "#000000",
+      "brand_blue": "#2563EB"
+    },
+    "status": {
+      "pending": "#F59E0B",
+      "confirmed": "#10B981",
+      "superseded": "#737373",
+      "archived_decayed": "#EF4444"
+    }
+  },
+  "layout": {
+    "spacing_system": "Generous on marketing (p-12, p-24), hyper-dense on dashboard (p-4, gap-4).",
+    "marketing_grid": "Tetris Grid - Asymmetrical, overlapping typography, large background textures.",
+    "dashboard_grid": "Control Room Grid - Dense layout, 1px visible borders separating regions, border-collapse style.",
+    "surfaces": "Retro-Futurism/Technical Grid. Zero soft shadows. All cards have 1px solid border (#262626). Corner radius max 2px (rounded-sm) or 0px (rounded-none)."
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-white text-black font-semibold rounded-none hover:bg-gray-200 transition-colors",
+      "secondary": "bg-transparent text-white border border-[#262626] rounded-none hover:bg-[#141414]",
+      "destructive": "bg-transparent text-red-500 border border-red-500/50 hover:bg-red-950 rounded-none"
+    },
+    "cards": {
+      "style": "bg-[#0A0A0A] border border-[#262626] rounded-none p-6",
+      "hover": "hover:border-white/50 transition-colors"
+    },
+    "badges": {
+      "style": "px-2 py-0.5 text-xs font-mono border rounded-none uppercase tracking-wider",
+      "pending": "border-amber-500/30 text-amber-500 bg-amber-500/10",
+      "confirmed": "border-emerald-500/30 text-emerald-500 bg-emerald-500/10"
+    },
+    "data_display": {
+      "tables": "Shadcn Table but stripped of rounded corners. Monospace cells for IDs/Dates. Sticky headers.",
+      "json_preview": "bg-[#050505] border border-[#262626] font-mono text-sm p-4 overflow-x-auto text-[#A3A3A3]"
+    },
+    "rules": [
+      "No default Shadcn radii; override to rounded-none or rounded-sm.",
+      "All interactive elements MUST include data-testid attribute.",
+      "Use Phosphor Icons (e.g., @phosphor-icons/react) for sharp, technical iconography."
+    ]
+  },
+  "pages": {
+    "marketing_landing": {
+      "hero": "Dark overlay (bg-black/60) over server rack image. Huge Cabinet Grotesk typography. Primary CTA 'Initialize Vault'.",
+      "marquee": "Slow kinetic marquee of 'Model Context Protocol / Claude Desktop / Cursor / JSON Export' in JetBrains Mono.",
+      "feature_bento": "Asymmetrical grid showing Fact Extraction, Context Budgeting, and Temporal Decay."
+    },
+    "dashboard_overview": {
+      "layout": "Sidebar navigation + Main content area.",
+      "metrics": "Row of stats (Total Facts, Pending, Archived, Events) in large monospace font.",
+      "queue": "Pending Confirmation Queue front and center. High-stakes facts require explicit 'Confirm' or 'Reject'."
+    },
+    "fact_browser": {
+      "view": "Dense data table or list. Columns: Type, Value, Confidence, Status, Provenance.",
+      "filters": "Tabs for Active, Pending, Superseded, Archived."
+    },
+    "context_pack_preview": {
+      "interaction": "Split screen: left side query input, right side JSON context pack output with token budget meter (progress bar in monospace)."
+    },
+    "mcp_settings": {
+      "view": "Form with copy-to-clipboard fields for Vault MCP Token and claude_desktop_config.json snippet."
+    }
+  },
+  "images": [
+    {
+      "category": "hero_background",
+      "url": "https://images.unsplash.com/photo-1639066648921-82d4500abf1a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTV8MHwxfHNlYXJjaHwxfHxzZXJ2ZXIlMjByYWNrfGVufDB8fHxibGFja3wxNzgzNDUxOTI0fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Large array of electronic equipment in a room (server rack). Use with bg-black/60 overlay.",
+      "placement": "Landing Page Hero Section"
+    },
+    {
+      "category": "feature_abstraction",
+      "url": "https://images.unsplash.com/photo-1561233835-f937539b95b9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMGRhdGElMjBncmlkfGVufDB8fHxibGFja3wxNzgzNDUxOTI0fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Abstract illuminated wall, looking like a data grid.",
+      "placement": "Landing Page Feature Section Background or Bento Box image"
+    },
+    {
+      "category": "architecture_texture",
+      "url": "https://images.unsplash.com/photo-1633432695903-9ef31eec6a05?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHwzfHxhYnN0cmFjdCUyMGRhdGElMjBncmlkfGVufDB8fHxibGFja3wxNzgzNDUxOTI0fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Black and white photo of a curved wall pattern.",
+      "placement": "Context Pack or Detail page subtle background texture"
+    }
+  ],
+  "accessibility_and_testing": {
+    "contrast": "All text must pass APCA and WCAG AA against #0A0A0A.",
+    "testing": "MANDATORY data-testid attributes on all buttons, links, inputs, and key informational elements (e.g., data-testid='confirm-fact-button').",
+    "motion": "Respect prefers-reduced-motion. Transitions should be fast (150ms) to feel snappy and responsive."
+  },
+  "instructions_to_main_agent": [
+    "Install required fonts (Cabinet Grotesk, Inter, JetBrains Mono) via Google Fonts or standard imports.",
+    "Install @phosphor-icons/react for the icon set.",
+    "When building Shadcn components, modify the default radii in tailwind.config.js to 0 or 0.125rem to maintain the brutalist feel.",
+    "Strictly follow the color hex codes provided. Do NOT use default Tailwind colors like slate or gray unless they map exactly to the provided background/border colors.",
+    "Do NOT add decorative gradients or soft shadows (shadow-md, shadow-lg). Rely on 1px solid borders for depth.",
+    "Ensure all interactive components are fully wired with data-testid for automated testing.",
+    "Use the provided image URLs strictly. Do not use placeholder services."
+  ]
+}
