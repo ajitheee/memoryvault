@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import client from "@/lib/api";
+import { copyToClipboard } from "@/lib/clipboard";
 import PageHeader from "@/components/PageHeader";
 import { toast } from "sonner";
 import { Copy, Loader2, Play } from "lucide-react";
@@ -16,9 +17,10 @@ export default function ContextPack() {
     onError: () => toast.error("Failed to build context pack"),
   });
 
-  const copy = () => {
-    navigator.clipboard.writeText(pack.context);
-    toast.success("Context pack copied");
+  const copy = async () => {
+    const ok = await copyToClipboard(pack.context);
+    if (ok) toast.success("Context pack copied");
+    else toast.error("Copy failed — select and copy manually");
   };
 
   const pct = pack ? Math.min(100, Math.round((pack.tokens_used / pack.token_budget) * 100)) : 0;

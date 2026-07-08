@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import client from "@/lib/api";
+import { copyToClipboard } from "@/lib/clipboard";
 import PageHeader from "@/components/PageHeader";
 import { toast } from "sonner";
 import { Copy, RefreshCw, Download, Plug, Terminal, CloudUpload, Package } from "lucide-react";
@@ -24,9 +25,10 @@ export default function Connect() {
   const endpoint = `${BACKEND}/api/mcp`;
   const token = info?.mcp_token || "";
 
-  const copy = (val, label) => {
-    navigator.clipboard.writeText(val);
-    toast.success(`${label} copied`);
+  const copy = async (val, label) => {
+    const ok = await copyToClipboard(val);
+    if (ok) toast.success(`${label} copied`);
+    else toast.error("Copy failed — select and copy manually");
   };
 
   const configSnippet = JSON.stringify(
