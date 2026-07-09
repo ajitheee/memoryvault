@@ -53,6 +53,12 @@ def test_no_facts_from_chitchat():
     assert facts == []
 
 
+def test_non_highstakes_facts_are_auto_active_confidence():
+    # >= 0.7 clears the auto-active threshold so supersession fires instead of
+    # every heuristic fact piling up in the pending queue.
+    assert _facts("I live in Chennai.")["home_city"]["confidence"] >= 0.7
+
+
 if __name__ == "__main__":
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     for fn in fns:
