@@ -49,13 +49,13 @@ export default function Landing() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#0A0F14]/50 via-[#0A0F14]/70 to-[#0A0F14]" />
         <div className="relative max-w-7xl mx-auto px-6 py-28 md:py-40">
           <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="font-mono text-xs uppercase tracking-[0.25em] text-neutral-400 mb-6">
-            Production MCP · User-owned AI memory
+            User-owned AI memory
           </motion.p>
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="font-heading font-black tracking-tighter leading-[0.95] text-5xl sm:text-7xl md:text-8xl max-w-4xl">
-            A memory your AI<br />actually keeps.
+            Your AI forgets you<br />every morning.
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mt-8 text-base md:text-lg text-neutral-300 max-w-2xl leading-relaxed">
-            MemoryVault ingests your interactions, extracts typed facts with confidence and provenance, handles supersession and decay, and serves a token-budgeted context pack to any model — over a real Model Context Protocol server.
+            You've told it your name, your work, your allergies, the way you like your answers — a hundred times. MemoryVault remembers for you, in a vault <span className="text-white font-medium">you own and can carry to any AI</span>. Not a chatbot's private notebook — a portable memory that's yours to read, correct, and take with you.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="mt-10 flex flex-wrap gap-3">
             <Link data-testid="hero-cta" to="/signup" className="group inline-flex items-center gap-2 px-6 py-3 bg-[#22D3EE] text-black font-semibold hover:bg-[#67E8F9] transition-colors">
@@ -65,6 +65,20 @@ export default function Landing() {
               Log in
             </Link>
           </motion.div>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.26 }} className="mt-10 font-mono text-xs uppercase tracking-[0.2em] text-neutral-500">
+            Your photos move with you · your money moves with you · your memory should too
+          </motion.p>
+        </div>
+      </section>
+
+      {/* Manifesto */}
+      <section className="border-b border-[#1F2A33] bg-[#0A0F14]">
+        <div className="max-w-4xl mx-auto px-6 py-24">
+          <p className="font-heading text-2xl sm:text-3xl md:text-4xl leading-snug tracking-tight text-neutral-200">
+            When AI finally learns to remember you, read the fine print: it remembers you inside <span className="text-neutral-500">someone else's walls</span>. Years of teaching it who you are — your work, your habits, the way you think — gone with a policy change, a billing error, or a border.
+            <br /><br />
+            <span className="text-white">You didn't build a memory. You rented one.</span> MemoryVault gives it back: what a machine knows about you should be a file you own — inspectable, correctable, portable to any model you choose.
+          </p>
         </div>
       </section>
 
