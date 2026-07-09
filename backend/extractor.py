@@ -169,8 +169,11 @@ def _run_heuristic(text, role):
         value = _clean_value(m.group(1))
         if not value:
             continue
+        # 0.75 clears the 0.7 auto-active threshold: these regex matches are
+        # precise, so non-high-stakes facts go active (and supersede prior ones)
+        # rather than all waiting in the pending queue. High-stakes still pends.
         facts.append({"type": ftype, "key": key, "value": value,
-                      "confidence": 0.6, "high_stakes": high})
+                      "confidence": 0.75, "high_stakes": high})
     return _normalize(facts), "heuristic"
 
 
