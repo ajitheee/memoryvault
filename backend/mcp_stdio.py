@@ -41,25 +41,21 @@ async def _resolve_vault():
     return user["id"] if user else None
 
 
-async def _stdin_reader():
-    loop = asyncio.get_event_loop()
-    reader = asyncio.StreamReader()
-    protocol = asyncio.StreamReaderProtocol(reader)
-    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
-    return reader
-
-
 async def main():
+    # Read stdin via a blocking readline on a worker thread. asyncio's
+    # connect_read_pipe does not support console/pipe stdin on Windows
+    # (raises WinError 6), so run_in_executor is the portable transport that
+    # works across Windows, macOS and Linux.
     vault_id = await _resolve_vault()
-    reader = await _stdin_reader()
+    loop = asyncio.get_event_loop()
     sys.stderr.write(f"[memoryvault-stdio] ready (vault={'ok' if vault_id else 'UNAUTH'})\n")
     sys.stderr.flush()
 
     while True:
-        raw = await reader.readline()
+        raw = await loop.run_in_executor(None, sys.stdin.readline)
         if not raw:
             break
-        line = raw.decode("utf-8").strip()
+        line = raw.strip()
         if not line:
             continue
         try:
