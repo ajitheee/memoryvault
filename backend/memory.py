@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from db import db
 from embeddings import embed, cosine
 from extractor import extract_facts, HIGH_STAKES_TYPES
+from ranking import combine_score
 
 ACTIVE_CONFIDENCE_THRESHOLD = 0.7
 
@@ -103,6 +104,9 @@ async def create_fact(vault_id, ftype, key, value, confidence, high_stakes,
         "superseded_by": None,
         "usage_count": 0,
         "last_used_at": None,
+        "helpful_count": 0,
+        "correction_count": 0,
+        "last_correction_at": None,
         "embedding": embed(canonical),
         "created_at": stamp,
         "updated_at": stamp,
@@ -142,8 +146,9 @@ def _score(fact, query_vec, now):
     vf = _parse_iso(fact.get("valid_from") or fact.get("created_at"))
     age_days = max(0.0, (now - vf).total_seconds() / 86400.0)
     recency = math.exp(-age_days / 30.0)
-    usage = 1 - math.exp(-fact.get("usage_count", 0) / 5.0)
-    score = 0.55 * sim + 0.2 * conf + 0.15 * recency + 0.1 * usage
+    score = combine_score(sim, conf, recency,
+                          fact.get("helpful_count", 0),
+                          fact.get("correction_count", 0))
     return round(score, 4), round(sim, 4)
 
 
@@ -247,6 +252,62 @@ async def reject_fact(vault_id: str, fact_id: str):
         {"$set": {"status": "archived", "updated_at": now_iso(), "rejected": True}},
     )
     return res.modified_count > 0
+
+
+# ---------------- Feedback loop (learned reranking) ----------------
+VALID_VERDICTS = {"helpful", "correction"}
+
+
+async def record_feedback(vault_id: str, fact_ids, verdict: str):
+    """Record the outcome of using facts in a response (the feedback loop).
+
+    verdict="helpful"    -> the served facts helped; nudge them up in future ranking.
+    verdict="correction" -> the user corrected the answer those facts produced;
+                            demote them so they surface less next time.
+
+    Missing counters are created by $inc, so this works on pre-existing facts
+    without a migration.
+    """
+    if verdict not in VALID_VERDICTS:
+        return {"error": "verdict must be one of %s" % sorted(VALID_VERDICTS)}
+    stamp = now_iso()
+    if verdict == "helpful":
+        update = {"$inc": {"helpful_count": 1}, "$set": {"last_used_at": stamp, "updated_at": stamp}}
+    else:
+        update = {"$inc": {"correction_count": 1}, "$set": {"last_correction_at": stamp, "updated_at": stamp}}
+    updated = 0
+    for fid in fact_ids or []:
+        res = await db.facts.update_one({"id": fid, "vault_id": vault_id}, update)
+        updated += res.modified_count
+    return {"verdict": verdict, "updated": updated}
+
+
+async def correct_fact(vault_id: str, fact_id: str, new_value: str = None):
+    """Explicit correction: "that fact is wrong (it's actually X)".
+
+    Always records the correction signal (demoting the fact). If `new_value` is
+    given, also supersedes it with the corrected value via the normal create/
+    supersede path, so the timeline stays consistent.
+    """
+    fact = await db.facts.find_one({"id": fact_id, "vault_id": vault_id}, {"_id": 0})
+    if not fact:
+        return None
+    stamp = now_iso()
+    await db.facts.update_one(
+        {"id": fact_id},
+        {"$inc": {"correction_count": 1}, "$set": {"last_correction_at": stamp, "updated_at": stamp}},
+    )
+    replacement = None
+    if new_value:
+        rep = await create_fact(
+            vault_id, fact["type"], fact["key"], new_value,
+            confidence=max(fact.get("confidence", 0.7), 0.9),
+            high_stakes=fact.get("high_stakes", False),
+            event_id=(fact.get("provenance") or {}).get("event_id"),
+            model="user-correction", role="user",
+        )
+        replacement = {k: v for k, v in rep.items() if k != "embedding"}
+    return {"corrected_id": fact_id, "replacement": replacement}
 
 
 async def list_pending(vault_id: str):

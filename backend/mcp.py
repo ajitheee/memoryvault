@@ -68,6 +68,18 @@ TOOLS = [
         "description": "List facts awaiting human confirmation.",
         "inputSchema": {"type": "object", "properties": {}},
     },
+    {
+        "name": "record_feedback",
+        "description": "Close the memory feedback loop. After using facts from search_memory/build_context_pack in a reply, report the outcome so ranking improves: verdict 'helpful' nudges those facts up; verdict 'correction' (the user corrected your answer) demotes them so they surface less next time.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "fact_ids": {"type": "array", "items": {"type": "string"}, "description": "IDs of the facts that were used"},
+                "verdict": {"type": "string", "enum": ["helpful", "correction"]},
+            },
+            "required": ["fact_ids", "verdict"],
+        },
+    },
 ]
 
 
@@ -98,6 +110,9 @@ async def _dispatch_tool(vault_id: str, name: str, args: dict):
         return r or {"error": "fact not found"}
     if name == "list_pending":
         return await memory.list_pending(vault_id)
+    if name == "record_feedback":
+        return await memory.record_feedback(
+            vault_id, args.get("fact_ids") or [], args.get("verdict", ""))
     raise ValueError(f"Unknown tool: {name}")
 
 

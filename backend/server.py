@@ -7,6 +7,8 @@ import logging
 from fastapi import FastAPI, APIRouter, Depends, HTTPException, Request, Response
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
+from typing import List, Optional
+
 from pydantic import BaseModel, Field
 
 from db import db
@@ -43,6 +45,15 @@ class SearchInput(BaseModel):
 class DecayInput(BaseModel):
     max_age_days: int = Field(default=60, ge=1)
     min_confidence: float = Field(default=0.5, ge=0.0, le=1.0)
+
+
+class FeedbackInput(BaseModel):
+    fact_ids: List[str] = Field(min_length=1)
+    verdict: str  # "helpful" | "correction"
+
+
+class CorrectInput(BaseModel):
+    new_value: Optional[str] = None
 
 
 def vault_id_of(user: dict) -> str:
@@ -88,6 +99,22 @@ async def reject(fact_id: str, user: dict = Depends(get_current_user)):
     if not ok:
         raise HTTPException(status_code=404, detail="Fact not found")
     return {"ok": True}
+
+
+@api_router.post("/facts/{fact_id}/correct")
+async def correct(fact_id: str, body: CorrectInput, user: dict = Depends(get_current_user)):
+    r = await memory.correct_fact(vault_id_of(user), fact_id, body.new_value)
+    if not r:
+        raise HTTPException(status_code=404, detail="Fact not found")
+    return r
+
+
+@api_router.post("/feedback")
+async def feedback(body: FeedbackInput, user: dict = Depends(get_current_user)):
+    r = await memory.record_feedback(vault_id_of(user), body.fact_ids, body.verdict)
+    if r.get("error"):
+        raise HTTPException(status_code=400, detail=r["error"])
+    return r
 
 
 @api_router.get("/pending")
